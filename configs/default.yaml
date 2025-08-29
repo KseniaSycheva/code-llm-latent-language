@@ -1,0 +1,13 @@
+defaults:
+  - _self_
+  - data@__global__: human_eval
+
+device: "1"
+output_path: "/home/sycheva/code-llm-latent-language/results/qwen"
+
+layers: [1, 10, 20]
+latent_type: "hidden"
+
+model_path: "Qwen/Qwen2.5-Coder-0.5B-Instruct"
+
+
