@@ -6,13 +6,14 @@ from datasets import Dataset
 from omegaconf import DictConfig
 from transformers import AutoTokenizer
 
-from code_llm_latent_language.data import prepare_human_eval
+from code_llm_latent_language.data import prepare_dataset
 from code_llm_latent_language.patches import LatentsType
 from code_llm_latent_language.patches.qwen import CustomQwen2ForCausalLM
+from code_llm_latent_language.patches.deepseek import CustomDeepseekV3ForCausalLM
 
 
 def generate_completions(
-    model, tokenizer, data: Dataset, layer_index: int, latent_type: LatentsType
+    model, tokenizer, data: Dataset, layer_index: int, latent_type
 ):
     generations = []
 
@@ -22,7 +23,11 @@ def generate_completions(
             inputs[k] = v.to("cuda")
 
         output = model.generate(
-            **inputs, layer_index=layer_index, latent_type=latent_type
+            **inputs,
+            layer_index=layer_index,
+            latent_type=latent_type,
+            max_new_tokens=256,
+            do_sample=True,
         )
         generations.append(
             {
@@ -34,12 +39,21 @@ def generate_completions(
     return generations
 
 
+def prepare_model(config: DictConfig):
+    if config.model_type == "qwen":
+        return CustomQwen2ForCausalLM.from_pretrained(config.model_path)
+    if config.model_type == "deepseek":
+        return CustomDeepseekV3ForCausalLM.from_pretrained(config.model_path)
+
+    raise ValueError(f"Model type {config.model_type} is unknown.")
+
+
 @hydra.main(config_path="config", config_name="config.yaml")
 def main(config: DictConfig):
     os.environ["CUDA_VISIBLE_DEVICES"] = config.device
 
-    data = prepare_human_eval(config.data)
-    model = CustomQwen2ForCausalLM.from_pretrained(config.model_path)
+    data = prepare_dataset(config.data)
+    model = prepare_model(config)
     model = model.to("cuda")
 
     tokenizer = AutoTokenizer.from_pretrained(config.model_path)

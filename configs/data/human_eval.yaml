@@ -2,3 +2,4 @@ data:
   seed: 42
   langs: ["js", "python", "cpp", "go", "java"]
   n_lang_examples: 5
+  dataset_path: "kseniasych/humanevalpack-qwen2.5-7b"

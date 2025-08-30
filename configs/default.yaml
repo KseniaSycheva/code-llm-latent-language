@@ -2,12 +2,13 @@ defaults:
   - _self_
   - data@__global__: human_eval
 
-device: "1"
-output_path: "/home/sycheva/code-llm-latent-language/results/qwen"
+device: "0"
+output_path: "results/qwen2p5-7b"
 
-layers: [1, 10, 20]
+layers: [21, 22, 23, 24, 25, 26]
 latent_type: "hidden"
 
-model_path: "Qwen/Qwen2.5-Coder-0.5B-Instruct"
+model_path: "Qwen/Qwen2.5-Coder-7B-Instruct"
+model_type: "qwen"
 
 

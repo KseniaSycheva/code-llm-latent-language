@@ -13,3 +13,17 @@ def prepare_human_eval(config: DictConfig):
         tasks.extend(subset.to_list())
 
     return Dataset.from_list(tasks)
+
+
+def prepare_dataset(config: DictConfig):
+    dataset = load_dataset(config.dataset_path, split="train")
+    rows = []
+
+    for lang in config.langs:
+        subset = dataset.filter(lambda x: x["language"] == lang)
+        subset = subset.shuffle(seed=config.seed).select(
+            [i for i in range(config.n_lang_examples)]
+        )
+        rows.extend(subset.to_list())
+
+    return Dataset.from_list(rows)
